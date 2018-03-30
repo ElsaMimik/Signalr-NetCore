@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using MsgPack.Serialization;
@@ -6,23 +7,43 @@ namespace signalr_aspnetcore_binary
 {
     public class ChatHub : Hub
     {
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-
-            Clients.All.InvokeAsync("broadcastMessage", "system", $"{Context.ConnectionId} joined the conversation");
-            return base.OnConnectedAsync();
-        }
-        public void Send(string name, string message)
-        {
-           // MessagePackSerializer.Create()
-            // Call the broadcastMessage method to update clients.
-            Clients.All.InvokeAsync("broadcastMessage", name, message);
+            await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} joined");
         }
 
-        public override Task OnDisconnectedAsync(System.Exception exception)
+        public override async Task OnDisconnectedAsync(Exception ex)
         {
-            Clients.All.InvokeAsync("broadcastMessage", "system", $"{Context.ConnectionId} left the conversation");
-            return base.OnDisconnectedAsync(exception);
+            await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} left");
+        }
+
+        public Task Send(string message)
+        {
+            return Clients.All.InvokeAsync("Send", $"{Context.ConnectionId}: {message}");
+        }
+
+        public Task SendToGroup(string groupName, string message)
+        {
+            return Clients.Group(groupName).InvokeAsync("Send", $"{Context.ConnectionId}@{groupName}: {message}");
+        }
+
+        public async Task JoinGroup(string groupName)
+        {
+            await Groups.AddAsync(Context.ConnectionId, groupName);
+
+            await Clients.Group(groupName).InvokeAsync("Send", $"{Context.ConnectionId} joined {groupName}");
+        }
+
+        public async Task LeaveGroup(string groupName)
+        {
+            await Groups.RemoveAsync(Context.ConnectionId, groupName);
+
+            await Clients.Group(groupName).InvokeAsync("Send", $"{Context.ConnectionId} left {groupName}");
+        }
+
+        public Task Echo(string message)
+        {
+            return Clients.Client(Context.ConnectionId).InvokeAsync("Send", $"{Context.ConnectionId}: {message}");
         }
     }
 }
