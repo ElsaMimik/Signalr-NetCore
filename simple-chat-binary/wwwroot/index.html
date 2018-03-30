@@ -19,7 +19,7 @@
         var protocol = new signalRMsgPack.MessagePackHubProtocol();
 //        let connection = new HubConnection("someurl", { transport: signalR.TransportType.LongPolling });
 //connection.start().then(() => {});
-        var connection = new signalR.HubConnection(`http://localhost:58619//chat`, { transport: transport, protocol: protocol });
+        var connection = new signalR.HubConnection(`http://${document.location.host}/chat`, { transport: transport, protocol: protocol });
 
         var messageInput = document.getElementById('message');
         var name = prompt('Enter your name:', '');
