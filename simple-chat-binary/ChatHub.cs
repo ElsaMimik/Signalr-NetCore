@@ -9,7 +9,10 @@ namespace signalr_aspnetcore_binary
     {
         public override async Task OnConnectedAsync() => await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} joined");
 
-        public override async Task OnDisconnectedAsync(Exception ex) => await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} left");
+        public override async Task OnDisconnectedAsync(Exception ex)
+        {
+            await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} left");
+        }
 
         public Task Send(string message) => Clients.All.InvokeAsync("Send", $"{Context.ConnectionId}: {message}");
 

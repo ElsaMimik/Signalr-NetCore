@@ -73,7 +73,7 @@
             return document.getElementById(id).value;
         }
         //****
-        var transport = signalR.TransportType.LongPolling;
+        var transport = signalR.TransportType.WebSockets;
         var protocol = new signalRMsgPack.MessagePackHubProtocol();      
         //var connection = new signalR.HubConnection(`http://${document.location.host}/chat`, { transport: transport, protocol: protocol });
         //****
