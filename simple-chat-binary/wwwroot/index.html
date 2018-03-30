@@ -92,10 +92,12 @@
             let http = new signalR.HttpConnection(`http://${document.location.host}/chat`, { transport: transport, protocol: protocol });
             connection = new signalR.HubConnection(http);
             connection.on('Send', msg => {
+                console.log('Send')
                 addLine('message-list', msg);
             });
 
             connection.onClosed = e => {
+                console.log('onClosed')
                 if (e) {
                     addLine('message-list', 'Connection closed with error: ' + e, 'red');
                 }
@@ -106,6 +108,7 @@
 
             connection.start()
                 .then(() => {
+                    console.log('start')
                     isConnected = true;
                     addLine('message-list', 'Connected successfully', 'green');
                 })
@@ -119,8 +122,10 @@
             disconnectButton.disabled = true;
             connection.stop()
                 .then(() => {
+                    console.log('stop')
                     isConnected = false;
                 });
+            console.log('left')
         });
 
         click('broadcast', event => {
@@ -136,6 +141,12 @@
         click('leave-group', event => {
             let groupName = getText('message-text');
             invoke(connection, 'LeaveGroup', groupName);
+        });
+
+        click('privatemsg', event => {
+            let receiverId = getText('target');
+            let message = getText('private-message-text');
+            invoke(connection, 'SendToSomeone', receiverId, message);
         });
 
         click('groupmsg', event => {

@@ -7,25 +7,15 @@ namespace signalr_aspnetcore_binary
 {
     public class ChatHub : Hub
     {
-        public override async Task OnConnectedAsync()
-        {
-            await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} joined");
-        }
+        public override async Task OnConnectedAsync() => await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} joined");
 
-        public override async Task OnDisconnectedAsync(Exception ex)
-        {
-            await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} left");
-        }
+        public override async Task OnDisconnectedAsync(Exception ex) => await Clients.All.InvokeAsync("Send", $"{Context.ConnectionId} left");
 
-        public Task Send(string message)
-        {
-            return Clients.All.InvokeAsync("Send", $"{Context.ConnectionId}: {message}");
-        }
+        public Task Send(string message) => Clients.All.InvokeAsync("Send", $"{Context.ConnectionId}: {message}");
 
-        public Task SendToGroup(string groupName, string message)
-        {
-            return Clients.Group(groupName).InvokeAsync("Send", $"{Context.ConnectionId}@{groupName}: {message}");
-        }
+        public Task SendToSomeone(string receiverId, string message) => Clients.Client(receiverId).InvokeAsync("Send", $"{Context.ConnectionId}@{receiverId}: {message}");
+
+        public Task SendToGroup(string groupName, string message) => Clients.Group(groupName).InvokeAsync("Send", $"{Context.ConnectionId}@{groupName}: {message}");
 
         public async Task JoinGroup(string groupName)
         {
